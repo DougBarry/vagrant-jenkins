@@ -52,8 +52,6 @@ cd /etc/nginx/sites-available
 sudo rm default ../sites-enabled/default
 sudo cp $VAGRANT_HOST_DIR/VirtualHost/jenkins /etc/nginx/sites-available/
 sudo ln -s /etc/nginx/sites-available/jenkins /etc/nginx/sites-enabled/
-sudo service nginx restart
-sudo service jenkins restart
 
 ########################
 # Adding title to MOTD
@@ -62,6 +60,13 @@ sudo apt-get install update-motd
 sudo cat $VAGRANT_HOST_DIR/motd.sh > /etc/update-motd.d/01-header
 sudo chmod 755 /etc/update-motd.d/01-header
 sudo /usr/sbin/update-motd
+
+########################
+# setting hostname
+########################
+echo "Setting Hostname"
+echo "jenkins" > /etc/hostname
+echo "127.0.0.1  jenkins" >> /etc/hosts
 
 echo "Success"
 
