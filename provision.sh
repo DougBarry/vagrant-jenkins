@@ -52,8 +52,6 @@ cd /etc/nginx/sites-available
 sudo rm default ../sites-enabled/default
 sudo cp $VAGRANT_HOST_DIR/VirtualHost/jenkins /etc/nginx/sites-available/
 sudo ln -s /etc/nginx/sites-available/jenkins /etc/nginx/sites-enabled/
-sudo service nginx restart
-sudo service jenkins restart
 
 ########################
 # Adding title to MOTD
