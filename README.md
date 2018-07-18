@@ -12,8 +12,9 @@ vagrant plugin install vagrant-reload
 ```
 
 ## Installation
-Build the vagrant box
+Add any Jenkins plugins you require to plugins.txt
 
+Build the vagrant box
 ```
 vagrant up
 ```
