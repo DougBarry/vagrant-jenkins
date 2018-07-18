@@ -1,6 +1,7 @@
 #!/bin/bash
 
 VAGRANT_HOST_DIR=/mnt/host_machine
+JENKINS_URL=http://localhost:8080
 
 ########################
 # Jenkins & Java
@@ -15,6 +16,33 @@ sudo cp $VAGRANT_HOST_DIR/JenkinsConfig/config.xml /var/lib/jenkins/
 sudo mkdir -p /var/lib/jenkins/users/admin
 sudo cp $VAGRANT_HOST_DIR/JenkinsConfig/users/admin/config.xml /var/lib/jenkins/users/admin/
 sudo chown -R jenkins:jenkins /var/lib/jenkins/users/
+
+echo "Restarting Jenkins"
+sudo service jenkins restart
+
+echo "Waiting for Jenkins to come back up"
+RETRY_LIMIT=10
+for i in $(seq 1 $RETRY_LIMIT); do
+  sleep 2
+  response=$(curl -Is $JENKINS_URL/jnlpJars/jenkins-cli.jar | head -n 1)
+  echo "$i $response"
+  if [[ $response = *"200"* ]]; then
+    echo "Jenkins restarted"
+    break
+  fi
+done
+
+echo "Updating Jenkins update centre data"
+curl -sL http://updates.jenkins-ci.org/update-center.json | sed '1d;$d' | curl -X POST -H 'Accept: application/json' -d @- $JENKINS_URL/updateCenter/byId/default/postBack
+
+echo "Installing Jenkins plugins"
+curl -so jenkins-cli.jar $JENKINS_URL/jnlpJars/jenkins-cli.jar
+
+for p in $(cat $VAGRANT_HOST_DIR/plugins.txt); do
+  echo "Installing Jenkins plugin $p"
+  java -jar jenkins-cli.jar -auth admin:admin -s $JENKINS_URL/ install-plugin $p
+done
+
 
 ########################
 # Node & npm
