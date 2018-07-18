@@ -63,6 +63,13 @@ sudo cat $VAGRANT_HOST_DIR/motd.sh > /etc/update-motd.d/01-header
 sudo chmod 755 /etc/update-motd.d/01-header
 sudo /usr/sbin/update-motd
 
+########################
+# setting hostname
+########################
+echo "Setting Hostname"
+echo "jenkins" > /etc/hostname
+echo "127.0.0.1  jenkins" >> /etc/hosts
+
 echo "Success"
 
 
