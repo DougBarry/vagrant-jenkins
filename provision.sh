@@ -49,8 +49,8 @@ done
 ########################
 echo "Installing Node & npm"
 curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-sudo apt-get -y install nodejs
-sudo apt-get -y install npm
+sudo apt-get -y install nodejs > /dev/null 2>&1
+sudo apt-get -y install npm > /dev/null 2>&1
 
 ########################
 # Docker
@@ -58,8 +58,8 @@ sudo apt-get -y install npm
 echo "Installing Docker"
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-sudo apt-get update
-sudo apt-get -y install docker-ce
+sudo apt-get update > /dev/null 2>&1
+sudo apt-get -y install docker-ce > /dev/null 2>&1
 sudo systemctl enable docker
 sudo usermod -aG docker ${USER}
 sudo usermod -aG docker jenkins
@@ -84,7 +84,7 @@ sudo ln -s /etc/nginx/sites-available/jenkins /etc/nginx/sites-enabled/
 ########################
 # Adding title to MOTD
 ########################
-sudo apt-get install update-motd
+sudo apt-get install update-motd > /dev/null 2>&1
 sudo cat $VAGRANT_HOST_DIR/motd.sh > /etc/update-motd.d/01-header
 sudo chmod 755 /etc/update-motd.d/01-header
 sudo /usr/sbin/update-motd
