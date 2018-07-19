@@ -43,6 +43,7 @@ for p in $(cat $VAGRANT_HOST_DIR/plugins.txt); do
   java -jar jenkins-cli.jar -auth admin:admin -s $JENKINS_URL/ install-plugin $p
 done
 
+sudo usermod -a -G jenkins vagrant
 
 ########################
 # Node & npm
