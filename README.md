@@ -6,9 +6,15 @@ Run latest Jenkins instance on Ubuntu 16.04 LTS using vagrant.
 * [VirtualBox](https://www.virtualbox.org/)
 * [Vagrant](https://www.vagrantup.com/)
 
-## Installation
-Build the vagrant box
+vagrant reload plugin
+```
+vagrant plugin install vagrant-reload
+```
 
+## Installation
+Add any Jenkins plugins you require to plugins.txt
+
+Build the vagrant box
 ```
 vagrant up
 ```
