@@ -4,6 +4,12 @@ VAGRANT_HOST_DIR=/mnt/host_machine
 JENKINS_URL=http://localhost:8080
 
 ########################
+# Quality of life tools - ensured
+########################
+sudo apt-get -y install vim screen htop > /dev/null 2>&1
+sudo apt-get -y install gcc g++ make > /dev/null 2>&1
+
+########################
 # Jenkins & Java
 ########################
 echo "Installing Jenkins and Java"
@@ -81,6 +87,11 @@ cd /etc/nginx/sites-available
 sudo rm default ../sites-enabled/default
 sudo cp /mnt/host_machine/VirtualHost/jenkins /etc/nginx/sites-available/
 sudo ln -s /etc/nginx/sites-available/jenkins /etc/nginx/sites-enabled/
+
+########################
+# Update all the things
+########################
+sudo apt-get -y update && sudo apt-get -y upgrade
 
 ########################
 # Adding title to MOTD
