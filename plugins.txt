@@ -1,5 +1,5 @@
 git
 github-api
-docker
+docker-plugin
 docker-workflow
-
+gitlab-plugin
