@@ -1,4 +1,5 @@
 git
+git-client
 github-api
 docker-plugin
 docker-workflow

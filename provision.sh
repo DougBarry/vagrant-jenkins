@@ -18,9 +18,9 @@ sudo sh -c 'echo deb http://pkg.jenkins-ci.org/debian binary/ > /etc/apt/sources
 sudo apt-get update > /dev/null 2>&1
 sudo apt-get -y install default-jdk jenkins > /dev/null 2>&1
 echo "Installing Jenkins default user and config"
-sudo cp $VAGRANT_HOST_DIR/JenkinsConfig/config.xml /var/lib/jenkins/
+sudo cp ${VAGRANT_HOST_DIR}/JenkinsConfig/config.xml /var/lib/jenkins/
 sudo mkdir -p /var/lib/jenkins/users/admin
-sudo cp $VAGRANT_HOST_DIR/JenkinsConfig/users/admin/config.xml /var/lib/jenkins/users/admin/
+sudo cp ${VAGRANT_HOST_DIR}/JenkinsConfig/users/admin/config.xml /var/lib/jenkins/users/admin/
 sudo chown -R jenkins:jenkins /var/lib/jenkins/users/
 
 echo "Restarting Jenkins"
@@ -39,15 +39,29 @@ for i in $(seq 1 $RETRY_LIMIT); do
 done
 
 echo "Updating Jenkins update centre data"
-curl -sL http://updates.jenkins-ci.org/update-center.json | sed '1d;$d' | curl -X POST -H 'Accept: application/json' -d @- $JENKINS_URL/updateCenter/byId/default/postBack
+XMLDOC=$(curl -sL https://updates.jenkins-ci.org/update-center.json)
 
-echo "Installing Jenkins plugins"
+if [[ $XMLDOC == *"A problem occurred while processing the request"* ]]; then
+  # document error!
+  echo "Skipping update center data"
+else
+  echo $XMLDOC | sed '1d;$d' | curl -X POST -H 'Accept: application/json' -d @- $JENKINS_URL/updateCenter/byId/default/postBack
+fi
+
 curl -so jenkins-cli.jar $JENKINS_URL/jnlpJars/jenkins-cli.jar
 
-for p in $(cat $VAGRANT_HOST_DIR/plugins.txt); do
+for p in $(cat ${VAGRANT_HOST_DIR}/plugins.txt); do
   echo "Installing Jenkins plugin $p"
-  java -jar jenkins-cli.jar -auth admin:admin -s $JENKINS_URL/ install-plugin $p
+  java -jar jenkins-cli.jar -auth admin:admin -s ${JENKINS_URL}/ install-plugin $p
 done
+
+echo "Updating other Jenkins plugins"
+UPDATE_LIST=$( java -jar jenkins-cli.jar -auth admin:admin -s ${JENKINS_URL}/ list-plugins | grep -e ')$' | awk '{ print $1 }' ); 
+if [ ! -z "${UPDATE_LIST}" ]; then 
+    echo Updating Jenkins Plugins: ${UPDATE_LIST}; 
+    java -jar jenkins-cli.jar -auth admin:admin -s ${JENKINS_URL}/ install-plugin ${UPDATE_LIST};
+    java -jar jenkins-cli.jar -auth admin:admin -s ${JENKINS_URL}/ safe-restart;
+fi
 
 sudo usermod -a -G jenkins vagrant
 
@@ -85,7 +99,7 @@ sudo service nginx start
 echo "Configuring nginx"
 cd /etc/nginx/sites-available
 sudo rm default ../sites-enabled/default
-sudo cp /mnt/host_machine/VirtualHost/jenkins /etc/nginx/sites-available/
+sudo cp ${VAGRANT_HOST_DIR}/VirtualHost/jenkins /etc/nginx/sites-available/
 sudo ln -s /etc/nginx/sites-available/jenkins /etc/nginx/sites-enabled/
 
 ########################
@@ -97,7 +111,7 @@ sudo apt-get -y update && sudo apt-get -y upgrade
 # Adding title to MOTD
 ########################
 sudo apt-get install update-motd > /dev/null 2>&1
-sudo cat $VAGRANT_HOST_DIR/motd.sh > /etc/update-motd.d/01-header
+sudo cat ${VAGRANT_HOST_DIR}/motd.sh > /etc/update-motd.d/01-header
 sudo chmod 755 /etc/update-motd.d/01-header
 sudo /usr/sbin/update-motd
 
@@ -107,7 +121,6 @@ sudo /usr/sbin/update-motd
 echo "Setting Hostname"
 echo "jenkins" > /etc/hostname
 echo "127.0.0.1  jenkins" >> /etc/hosts
-
 echo "Success"
-
-
+echo "Rebooting"
+#sudo reboot
